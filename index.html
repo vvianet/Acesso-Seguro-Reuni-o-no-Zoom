@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Seguro ao Zoom</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .login-container {
+            display: inline-block;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        input[type="email"], input[type="password"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Verde */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45A049;
+        }
+        .mensagem {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Acesso Seguro à Reunião no Zoom</h1>
+    <div class="login-container">
+        <p>Digite seu e-mail e senha para acessar:</p>
+        <input type="email" id="email-input" placeholder="Seu e-mail" required>
+        <input type="password" id="senha-input" placeholder="Sua senha" required>
+        <button id="botao-login">Acessar</button>
+        <div id="mensagem" class="mensagem"></div>
+    </div>
+
+    <script>
+        // Função para verificar o acesso
+        document.getElementById("botao-login").addEventListener("click", function() {
+            const emailDigitado = document.getElementById("email-input").value.trim();
+            const senhaDigitada = document.getElementById("senha-input").value.trim();
+            const mensagemElemento = document.getElementById("mensagem");
+
+            // Enviar os dados para o backend
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redireciona para o link do Zoom
+                    window.location.href = data.link;
+                } else {
+                    // Exibe mensagem de erro
+                    mensagemElemento.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                mensagemElemento.textContent = "Ocorreu um erro ao processar sua solicitação.";
+            });
+        });
+    </script>
+</body>
+</html>
