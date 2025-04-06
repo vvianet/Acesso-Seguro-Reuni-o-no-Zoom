@@ -39,7 +39,7 @@ const usuariosAutorizados = [
 ];
 
 // Link da reunião do Zoom (oculto)
-const linkZoom = "https://us06web.zoom.us/j/88113615679";
+const linkZoom = "https://us06web.zoom.us/j/86934315002";
 
 // Armazenamento temporário de sessões ativas
 const sessoesAtivas = new Set();
