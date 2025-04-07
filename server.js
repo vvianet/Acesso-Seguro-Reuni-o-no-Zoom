@@ -33,7 +33,7 @@ const usuariosAutorizados = [
     { email: "adriano.pbi.rs@gmail.com", senha: "l2sWwIBc" },
     { email: "r.oliva.carvajal@gmail.com", senha: "pvnz8rju" },
     { email: "djwillce@gmail.com", senha: "41zBjeJo" },
-    { email: "usuario2@gmail.com", senha: "abc456" },
+    { email: "joao.simao.simon@gmail.com", senha: "5f1nURdk" },
     { email: "usuario2@gmail.com", senha: "abc456" },
     { email: "usuario3@gmail.com", senha: "xyz789" }
 ];
