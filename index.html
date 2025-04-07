@@ -53,35 +53,45 @@
     </div>
 
     <script>
-        // Função para verificar o acesso
-        document.getElementById("botao-login").addEventListener("click", function() {
-            const emailDigitado = document.getElementById("email-input").value.trim();
-            const senhaDigitada = document.getElementById("senha-input").value.trim();
-            const mensagemElemento = document.getElementById("mensagem");
+    // Função para verificar o acesso
+    document.getElementById("botao-login").addEventListener("click", function() {
+        const emailDigitado = document.getElementById("email-input").value.trim();
+        const senhaDigitada = document.getElementById("senha-input").value.trim();
+        const mensagemElemento = document.getElementById("mensagem");
 
-            // Enviar os dados para o backend
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+        // Enviar os dados para o backend
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: emailDigitado, senha: senhaDigitada })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Conecta-se ao WebSocket para monitorar a sessão
+                const socket = new WebSocket(`ws://localhost:8080/${emailDigitado}`);
+
+                socket.onopen = () => {
+                    console.log("Conexão WebSocket estabelecida.");
                     // Redireciona para o link do Zoom
                     window.location.href = data.link;
-                } else {
-                    // Exibe mensagem de erro
-                    mensagemElemento.textContent = data.message;
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                mensagemElemento.textContent = "Ocorreu um erro ao processar sua solicitação.";
-            });
+                };
+
+                socket.onclose = () => {
+                    console.log("Conexão WebSocket encerrada.");
+                };
+            } else {
+                // Exibe mensagem de erro
+                mensagemElemento.textContent = data.message;
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mensagemElemento.textContent = "Ocorreu um erro ao processar sua solicitação.";
         });
-    </script>
+    });
+</script>
 </body>
 </html>
