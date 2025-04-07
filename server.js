@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const WebSocket = require('ws');
 
 const app = express();
 app.use(bodyParser.json());
@@ -77,6 +78,22 @@ app.post('/login', (req, res) => {
 // Servir o arquivo HTML
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
+});
+
+// Configuração do WebSocket
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', (ws, req) => {
+    const email = req.url.slice(1); // Obtém o e-mail da URL
+
+    // Quando o cliente se conecta, adiciona o e-mail à lista de sessões ativas
+    sessoesAtivas.add(email);
+
+    // Quando o cliente desconecta, remove o e-mail da lista de sessões ativas
+    ws.on('close', () => {
+        sessoesAtivas.delete(email);
+        console.log(`E-mail ${email} foi removido da lista de sessões ativas.`);
+    });
 });
 
 // Inicia o servidor
