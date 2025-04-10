@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocket = require('ws');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(bodyParser.json());
@@ -42,6 +43,25 @@ const usuariosAutorizados = [
 // Link da reunião do Zoom (oculto)
 const linkZoom = "https://us06web.zoom.us/j/83620817355";
 
+// Chave secreta para assinar os tokens JWT
+const JWT_SECRET = "sua_chave_secreta_aqui"; // Altere para uma chave segura
+
+// Middleware para verificar o token JWT
+function verificarToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(403).json({ success: false, message: "Token de autenticação ausente." });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.usuario = decoded; // Armazena os dados do token no objeto de requisição
+        next();
+    } catch (err) {
+        return res.status(401).json({ success: false, message: "Token inválido ou expirado." });
+    }
+}
+
 // Armazenamento temporário de sessões ativas
 const sessoesAtivas = new Set();
 
@@ -66,13 +86,22 @@ app.post('/login', (req, res) => {
     // Adiciona o e-mail à lista de sessões ativas
     sessoesAtivas.add(email);
 
-    // Retorna o link do Zoom
-    res.json({ success: true, link: linkZoom });
+    // Gera um token JWT válido por 1 hora
+    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Remove o e-mail da lista de sessões ativas após 1 hora (3600000 ms)
+    // Retorna o token e o link do Zoom
+    res.json({ success: true, token, link: linkZoom });
+});
+
+// Rota protegida para acessar o link do Zoom
+app.get('/acessar-zoom', verificarToken, (req, res) => {
+    // O middleware verificarToken já validou o token
+    res.json({ success: true, link: linkZoom });
+});
+    // Remove o e-mail da lista de sessões ativas após 15 min (900000 ms)
     setTimeout(() => {
         sessoesAtivas.delete(email);
-    }, 3600000);
+    }, 900000);
 });
 
 // Servir o arquivo HTML
