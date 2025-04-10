@@ -53,6 +53,8 @@
     </div>
 
     <script>
+        let token = null;
+        
     // Função para verificar o acesso
     document.getElementById("botao-login").addEventListener("click", function() {
         const emailDigitado = document.getElementById("email-input").value.trim();
@@ -72,9 +74,12 @@
             if (data.success) {
                 // Conecta-se ao WebSocket para monitorar a sessão
                 const socket = new WebSocket(`ws://localhost:8080/${emailDigitado}`);
-
+      
                 socket.onopen = () => {
                     console.log("Conexão WebSocket estabelecida.");
+                    // Armazena o token JWT
+                    token = data.token;
+                    
                     // Redireciona para o link do Zoom
                     window.location.href = data.link;
                 };
@@ -92,6 +97,34 @@
             mensagemElemento.textContent = "Ocorreu um erro ao processar sua solicitação.";
         });
     });
-</script>
+
+        // Função para acessar uma rota protegida (opcional)
+        function acessarRotaProtegida() {
+            if (!token) {
+                alert("Você precisa fazer login primeiro.");
+                return;
+            }
+
+            fetch('/acessar-zoom', {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Acesso permitido! Você será redirecionado para o Zoom.");
+                    window.location.href = data.link;
+                } else {
+                    alert("Acesso negado: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert("Ocorreu um erro ao acessar a rota protegida.");
+            });
+        }
+    </script>
 </body>
 </html>
