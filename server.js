@@ -41,7 +41,7 @@ const usuariosAutorizados = [
 ];
 
 // Link da reunião do Zoom (oculto)
-const linkZoom = "https://us06web.zoom.us/j/83620817355";
+const linkZoom = "https://us06web.zoom.us/j/86926847912";
 
 // Chave secreta para assinar os tokens JWT
 const JWT_SECRET = "sua_chave_secreta_aqui"; // Altere para uma chave segura
